@@ -74,6 +74,7 @@ class Plugin_Name_Admin {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/lib/leaflet.css', array(), $this->version, 'all' );
 
 	}
 
@@ -97,7 +98,31 @@ class Plugin_Name_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/lib/leaflet.js', array( 'jquery' ), $this->version, false );
 
 	}
 
 }
+
+
+// Функция для вывода формы создания карты в админке
+function leaflet_map_admin_page() {
+    echo '<h2>Создать карту</h2>';
+    echo '<div id="leaflet-map"></div>';
+    echo '<button id="generate-map">Cгенерировать шорткод</button>';
+}
+
+// Регистрация страницы в админке
+function leaflet_map_admin_menu() {
+    add_menu_page('Leaflet Map', 'Leaflet Map', 'manage_options', 'leaflet-map', 'leaflet_map_admin_page');
+}
+add_action('admin_menu', 'leaflet_map_admin_menu');
+
+// Функция для обработки запроса AJAX и генерации шорткода
+function generate_leaflet_map_shortcode() {
+    $shortcode = '[leaflet-map]';
+    echo $shortcode;
+    die();
+}
+add_action('wp_ajax_generate_leaflet_map_shortcode', 'generate_leaflet_map_shortcode');
+add_action('wp_ajax_nopriv_generate_leaflet_map_shortcode', 'generate_leaflet_map_shortcode');

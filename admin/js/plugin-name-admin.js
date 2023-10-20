@@ -30,3 +30,21 @@
 	 */
 
 })( jQuery );
+
+jQuery(document).ready(function ($) {
+    var map = L.map('leaflet-map').setView([53.9, 27.6], 6); // Координаты для центра Беларуси
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    $('#generate-map').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: ajaxurl,
+            data: { action: 'generate_leaflet_map_shortcode' },
+            success: function (shortcode) {
+                alert('Generated shortcode: ' + shortcode);
+            }
+        });
+    });
+});

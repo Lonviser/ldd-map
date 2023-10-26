@@ -73,8 +73,8 @@ class Plugin_Name_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/plugin-name-admin.css', array(), $this->version, 'all' );
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/lib/leaflet.css', array(), $this->version, 'all' );
+		 wp_enqueue_style('plugin-name-admin-css', plugin_dir_url(__FILE__) . 'css/plugin-name-admin.css', array(), $this->version, 'all');
+		 wp_enqueue_style('leaflet-css', plugin_dir_url(__FILE__) . 'css/lib/leaflet.css', array(), $this->version, 'all');
 
 	}
 
@@ -84,45 +84,32 @@ class Plugin_Name_Admin {
 	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Plugin_Name_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/plugin-name-admin.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/lib/leaflet.js', array( 'jquery' ), $this->version, false );
-
-	}
-
+		wp_enqueue_script('plugin-name-admin-js', plugin_dir_url(__FILE__) . 'js/plugin-name-admin.js', array('jquery'), $this->version, false);
+		}
 }
 
-
-// Функция для вывода формы создания карты в админке
-function leaflet_map_admin_page() {
-    echo '<h2>Создать карту</h2>';
-    echo '<div id="leaflet-map"></div>';
-    echo '<button id="generate-map">Cгенерировать шорткод</button>';
+// Enqueue Leaflet library
+function enqueue_leaflet_library() {
+    wp_enqueue_script('leaflet', 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js');
+    wp_enqueue_style('leaflet-css', 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css');
 }
+add_action('wp_enqueue_scripts', 'enqueue_leaflet_library');
 
-// Регистрация страницы в админке
-function leaflet_map_admin_menu() {
-    add_menu_page('Leaflet Map', 'Leaflet Map', 'manage_options', 'leaflet-map', 'leaflet_map_admin_page');
-}
-add_action('admin_menu', 'leaflet_map_admin_menu');
+// Function to render the Leaflet map
+function render_leaflet_map() {
+    ob_start(); ?>
+    <div id="leaflet-map" style="width: 100%; height: 400px;"></div>
+    <script>
+        // JavaScript code to initialize and display the map
+        var map = L.map('leaflet-map').setView([53.7098, 27.9534], 6); // Set the coordinates for Belarus and an appropriate zoom level
 
-// Функция для обработки запроса AJAX и генерации шорткода
-function generate_leaflet_map_shortcode() {
-    $shortcode = '[leaflet-map]';
-    echo $shortcode;
-    die();
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    </script>
+    <?php
+    return ob_get_clean();
 }
-add_action('wp_ajax_generate_leaflet_map_shortcode', 'generate_leaflet_map_shortcode');
-add_action('wp_ajax_nopriv_generate_leaflet_map_shortcode', 'generate_leaflet_map_shortcode');
+add_shortcode('leaflet-map', 'render_leaflet_map');
+
+
